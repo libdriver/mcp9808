@@ -1,0 +1,96 @@
+/**
+ * Copyright (c) 2015 - present LibDriver All rights reserved
+ * 
+ * The MIT License (MIT)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE. 
+ *
+ * @file      driver_mcp9808_basic.h
+ * @brief     driver mcp9808 basic header file
+ * @version   1.0.0
+ * @author    Shifeng Li
+ * @date      2026-01-25
+ *
+ * <h3>history</h3>
+ * <table>
+ * <tr><th>Date        <th>Version  <th>Author      <th>Description
+ * <tr><td>2026/01/25  <td>1.0      <td>Shifeng Li  <td>first upload
+ * </table>
+ */
+
+#ifndef DRIVER_MCP9808_BASIC_H
+#define DRIVER_MCP9808_BASIC_H
+
+#include "driver_mcp9808_interface.h"
+
+#ifdef __cplusplus
+extern "C"{
+#endif
+
+/**
+ * @defgroup mcp9808_example_driver mcp9808 example driver function
+ * @brief    mcp9808 example driver modules
+ * @ingroup  mcp9808_driver
+ * @{
+ */
+
+/**
+ * @brief mcp9808 basic example default definition
+ */
+#define MCP9808_BASIC_DEFAULT_HYSTERESIS        MCP9808_HYSTERESIS_0P0           /**< 0.0C */
+#define MCP9808_BASIC_DEFAULT_RESOLUTION        MCP9808_RESOLUTION_0P0625        /**< 0.0625C */
+
+/**
+ * @brief     basic example init
+ * @param[in] addr iic device address
+ * @return    status code
+ *            - 0 success
+ *            - 1 init failed
+ * @note      none
+ */
+uint8_t mcp9808_basic_init(mcp9808_address_t addr);
+
+/**
+ * @brief  basic example deinit
+ * @return status code
+ *         - 0 success
+ *         - 1 deinit failed
+ * @note   none
+ */
+uint8_t mcp9808_basic_deinit(void);
+
+/**
+ * @brief      basic example read
+ * @param[out] *temperature_deg pointer to a converted temperature buffer
+ * @return     status code
+ *             - 0 success
+ *             - 1 read failed
+ * @note       none
+ */
+uint8_t mcp9808_basic_read(float *temperature_deg);
+
+/**
+ * @}
+ */
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif
