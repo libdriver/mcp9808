@@ -402,25 +402,29 @@ uint8_t mcp9808_get_addr(mcp9808_handle_t *handle, mcp9808_address_t *addr)
  */
 uint8_t mcp9808_temperature_convert_to_register(mcp9808_handle_t *handle, float temperature_deg, uint16_t *reg)
 {
-    if (handle == NULL)                                                /* check handle */
+    int16_t raw;
+    
+    if (handle == NULL)                                           /* check handle */
     {
-        return 2;                                                      /* return error */
+        return 2;                                                 /* return error */
     }
-    if (handle->inited != 1)                                           /* check handle initialization */
+    if (handle->inited != 1)                                      /* check handle initialization */
     {
-        return 3;                                                      /* return error */
+        return 3;                                                 /* return error */
     }
     
-    if (temperature_deg > 0.0f)                                        /* > 0 */
+    if (temperature_deg >= 0.0f)                                  /* >=0 */
     {
-        *reg = (uint16_t)(temperature_deg * 4.0f);                     /* convert real data to register data */
+        raw = (int16_t)(temperature_deg / 0.0625f + 0.5f);        /* convert */
     }
-    else                                                               /* < 0 */
+    else
     {
-        *reg = (uint16_t)(-temperature_deg * 4.0f) | (1 << 10);        /* convert real data to register data */
+        raw = (int16_t)(temperature_deg / 0.0625f - 0.5f);        /* convert */
     }
     
-    return 0;                                                          /* success return 0 */
+    *reg = (uint16_t)(raw & 0x1FFF);                              /* convert */
+    
+    return 0;                                                     /* success return 0 */
 }
 
 /**
@@ -436,26 +440,26 @@ uint8_t mcp9808_temperature_convert_to_register(mcp9808_handle_t *handle, float 
  */
 uint8_t mcp9808_temperature_convert_to_data(mcp9808_handle_t *handle, uint16_t reg, float *temperature_deg)
 {
-    if (handle == NULL)                                  /* check handle */
+    int16_t raw;
+    
+    if (handle == NULL)                             /* check handle */
     {
-        return 2;                                        /* return error */
+        return 2;                                   /* return error */
     }
-    if (handle->inited != 1)                             /* check handle initialization */
+    if (handle->inited != 1)                        /* check handle initialization */
     {
-        return 3;                                        /* return error */
+        return 3;                                   /* return error */
     }
     
-    if ((reg & (1 << 10)) != 0)                          /* check signed bit */
+    raw = (int16_t)(reg & 0x1FFF);                  /* convert */
+    if ((raw & 0x1000) != 0)                        /* check flag */
     {
-        reg &= ~(1 << 10);                               /* clear sign bit */
-        *temperature_deg = -(float)(reg) * 0.25f;        /* convert raw data to real data */
-    }
-    else
-    {
-        *temperature_deg = (float)(reg) * 0.25f;         /* convert raw data to real data */
+        raw |= 0xE000;                              /* convert */
     }
     
-    return 0;                                            /* success return 0 */
+    *temperature_deg = (float)raw * 0.0625f;        /* convert */
+    
+    return 0;                                       /* success return 0 */
 }
 
 /**
