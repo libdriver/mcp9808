@@ -404,27 +404,31 @@ uint8_t mcp9808_temperature_convert_to_register(mcp9808_handle_t *handle, float 
 {
     int16_t raw;
     
-    if (handle == NULL)                                           /* check handle */
+    if (handle == NULL)                                             /* check handle */
     {
-        return 2;                                                 /* return error */
+        return 2;                                                   /* return error */
     }
-    if (handle->inited != 1)                                      /* check handle initialization */
+    if (handle->inited != 1)                                        /* check handle initialization */
     {
-        return 3;                                                 /* return error */
+        return 3;                                                   /* return error */
     }
     
-    if (temperature_deg >= 0.0f)                                  /* >=0 */
+    if (temperature_deg >= 0.0f)                                    /* >=0 */
     {
-        raw = (int16_t)(temperature_deg / 0.0625f + 0.5f);        /* convert */
+        raw = (int16_t)(temperature_deg / 0.25f + 0.5f);            /* convert, 0.25C/lsb */
     }
     else
     {
-        raw = (int16_t)(temperature_deg / 0.0625f - 0.5f);        /* convert */
+        raw = (int16_t)(temperature_deg / 0.25f - 0.5f);            /* convert */
+    }
+    if ((raw > 1023) || (raw < -1024))                              /* check 11-bit range */
+    {
+        return 4;                                                   /* return error */
     }
     
-    *reg = (uint16_t)(raw & 0x1FFF);                              /* convert */
+    *reg = (uint16_t)(raw & 0x7FF);                                 /* 11-bit two's complement */
     
-    return 0;                                                     /* success return 0 */
+    return 0;                                                       /* success return 0 */
 }
 
 /**
@@ -451,13 +455,13 @@ uint8_t mcp9808_temperature_convert_to_data(mcp9808_handle_t *handle, uint16_t r
         return 3;                                   /* return error */
     }
     
-    raw = (int16_t)(reg & 0x1FFF);                  /* convert */
-    if ((raw & 0x1000) != 0)                        /* check flag */
+    raw = (int16_t)(reg & 0x7FF);                   /* get 11-bit data */
+    if ((raw & 0x400) != 0)                         /* check 11-bit sign bit */
     {
-        raw |= 0xE000;                              /* convert */
+        raw |= 0xF800U;                             /* sign extend to 16-bit */
     }
     
-    *temperature_deg = (float)raw * 0.0625f;        /* convert */
+    *temperature_deg = (float)raw * 0.25f;          /* convert, 0.25C/lsb */
     
     return 0;                                       /* success return 0 */
 }
